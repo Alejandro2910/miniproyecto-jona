@@ -1,14 +1,15 @@
-import matplotlib
+from matplotlib import pyplot as plt
 import math
 import numpy as np
+from time import sleep as sl
 
 masa_persona = materiales = masa_silla = duracion_movimiento = 0
-g = h = f = e = P = o = q = p = A = B = C = D = E = F = lg3 = rg3 = alpha2 = alpha3 = alpha4 = w2 = w3 = w4 = theta3 = 0.0
-#Probar módulo para reducir longitud
+g = h = f = e = P = o = q = p = A = B = C = D = E = F = lg3 = rg3 = w3 = w4 = mo = 0.00
+lx = ly = mx = my = nx = ny = ox = oy = alpha2 = alpha3 = alpha4 = w2 = theta3 =  0.00
 longitud_eslabones = np.array([1.14, 1.28, 1.14, 1.28])
-masa_eslabones = np.zeros((1, 4))
-peso_eslabones = np.zeros((1, 4))
-momento_inercia_eslabones = np.zeros((1, 4))
+masa_eslabones = np.array([0., 0., 0., 0.])
+peso_eslabones = np.array([0., 0., 0., 0.])
+momento_inercia_eslabones = np.array([0., 0., 0., 0.])
 acel_cent = np.zeros((3,2), float)
 
 ancho = 0.05
@@ -62,7 +63,6 @@ def calcule_masa_eslabones():
     global masa_eslabones
     densidad = 0
     volumen = 0.01
-
     if materiales == 1:
         densidad = 7860
     elif materiales == 2:
@@ -142,8 +142,8 @@ def calcule_acel_cent(gamma):
     acel_cent[0][1] = (-math.pow(w2, 2))*(longitud_eslabones[0]/2)*math.sin(math.radians(theta2))
 
     #Eslabón 3
-    acel_cent[1][0] = ((-math.pow(w2, 2))*longitud_eslabones[0]*(math.cos(math.radians(theta2)))) - ((-math.pow(w3))*lg3*(math.cos(math.radians(gamma)))) - (alpha3 * lg3 * math.sin(math.radians(gamma)))
-    acel_cent[1][1] = ((-math.pow(w2, 2))*longitud_eslabones[0]*(math.sin(math.radians(theta2)))) - ((-math.pow(w3))*lg3*(math.sin(math.radians(gamma)))) - (alpha3 * lg3 * math.cos(math.radians(gamma)))
+    acel_cent[1][0] = ((-math.pow(w2, 2))*longitud_eslabones[0]*(math.cos(math.radians(theta2)))) - ((-math.pow(w3, 2))*lg3*(math.cos(math.radians(gamma)))) - (alpha3 * lg3 * math.sin(math.radians(gamma)))
+    acel_cent[1][1] = ((-math.pow(w2, 2))*longitud_eslabones[0]*(math.sin(math.radians(theta2)))) - ((-math.pow(w3, 2))*lg3*(math.sin(math.radians(gamma)))) - (alpha3 * lg3 * math.cos(math.radians(gamma)))
 
     #Eslabón 4
     acel_cent[2][0] = ((-math.pow(w4, 2))*(longitud_eslabones[2] / 2)*(math.cos(math.radians(theta4)))) - (alpha4*(longitud_eslabones[2] / 2)*(math.sin(math.radians(theta4))))
@@ -179,37 +179,92 @@ def calcule_rg3():
     global rg3
     rg3 = (i / 2) - j
 
-if __name__ == "__main__":
-    global theta2, theta4
+def calcule_L_actual():
+    global lx, ly
+    lx = (1 / (e + f))*(- o - p - ly * (g + h))
+    ly = (-q)/(k + n)
+    return math.sqrt(math.pow(lx, 2) + math.pow(ly, 2))
 
-    solicitud_datos_entrada()
-    calcule_w2()
-    calcule_masa_eslabones()
-    calcule_peso_eslabones()
-    calcule_momento_inercia()
+def calcule_M_actual():
+    global mx, my
+    mx = - P - lx - peso_eslabones[2] - masa_eslabones[2] * acel_cent[1][0]
+    my = - ly - masa_eslabones[2] * acel_cent[1][1]
+    return math.sqrt(math.pow(mx, 2) + math.pow(my, 2)) 
 
-    #Descenso
-    for gamma in np.arange(0.00, 38.00, 1.00):
-        theta2 = theta2 + gamma
-        theta4 = theta2
+def calcule_N_actual():
+    global nx, ny
+    nx = mx - peso_eslabones[3] - masa_eslabones[3] * acel_cent[2][0]
+    ny = my - masa_eslabones[3] * acel_cent[2][1]
+    return math.sqrt(math.pow(nx, 2) + math.pow(ny, 2))  
 
-        calcule_A()
-        calcule_B()
-        calcule_C()
-        calcule_D()
-        calcule_E()
-        calcule_F()
+def calcule_O_actual():
+    global ox
+    ox = peso_eslabones[1] + masa_eslabones[1] * acel_cent[0][0] - lx
+    oy = masa_eslabones[1]*acel_cent[0][1] - ly
+    return math.sqrt(math.pow(ox, 2) + math.pow(oy, 2))
 
-        calcule_alpha4()
-        calcule_alpha3()
+def calcule_momento_entrada_actual():
+    return (lx * e) + (ly * g) - (ox * f) - (oy * h)  
 
-        calcule_LG3()
-        calcule_acel_cent(gamma)
+def imprima_valores_actuales(gamma, theta2):
+    print("Para el valor actual de gamma {} y theta2 {}".format(gamma, theta2))
+    print("A: {}".format(A))
+    print("B: {}".format(B))
+    print("C: {}".format(C))
+    print("D: {}".format(D))
+    print("E: {}".format(E))
+    print("F: {}".format(F))
+    print()
+    print("Alpha3: {}".format(alpha3))
+    print("Alpha3: {}".format(alpha3))
 
-        calcule_f(gamma)
-        calcule_g(gamma)
-        calcule_o()
-        calcule_PFuerza()
-        calcule_p()
-        calcule_rg3()
-        calcule_q()
+#Main
+m0_desc = L_desc = M_desc = N_desc = O_desc = np.zeros(38)
+gamma_values = np.arange(0.00, 38.00, 1.00)
+
+solicitud_datos_entrada()
+calcule_w2()
+calcule_masa_eslabones()
+calcule_peso_eslabones()
+calcule_momento_inercia()
+
+#Descenso
+for gamma in gamma_values:
+    theta2 = theta2 + 1
+    theta4 = theta2
+
+    calcule_A()
+    calcule_B()
+    calcule_C()
+    calcule_D()
+    calcule_E()
+    calcule_F()
+
+    calcule_alpha4()
+    calcule_alpha3()
+
+    calcule_LG3()
+    calcule_acel_cent(gamma)
+
+    calcule_f(gamma)
+    calcule_g(gamma)
+    calcule_o()
+    calcule_PFuerza()
+    calcule_p()
+    calcule_rg3()
+    calcule_q()
+
+    m0_desc[int(gamma) - 1] = calcule_momento_entrada_actual()
+    L_desc[int(gamma) - 1] = calcule_L_actual()
+    M_desc[int(gamma) - 1] = calcule_M_actual()
+    N_desc[int(gamma) - 1] = calcule_N_actual()
+    O_desc[int(gamma) - 1] = calcule_O_actual()
+    imprima_valores_actuales(gamma, theta2)
+    sl(1)
+
+plt.plot(gamma_values, L_desc, label = 'L')
+plt.plot(gamma_values, M_desc, label = 'M')
+plt.plot(gamma_values, N_desc, label = 'N')
+plt.plot(gamma_values, O_desc, label = 'O')
+plt.legend()
+plt.show()
