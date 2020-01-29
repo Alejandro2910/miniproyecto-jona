@@ -281,7 +281,7 @@ for gamma in gamma_values:
     M_desc[int(gamma)] = calcule_M_actual()
     N_desc[int(gamma)] = calcule_N_actual()
     O_desc[int(gamma)] = calcule_O_actual()
-    imprima_valores_actuales(gamma, theta2, L_desc, M_desc, N_desc, O_desc, m0_desc)
+    #imprima_valores_actuales(gamma, theta2, L_desc, M_desc, N_desc, O_desc, m0_desc)
     theta2 = theta2 + 1
     theta4 = theta2
 
@@ -291,5 +291,6 @@ plt.plot(gamma_values, L_desc, label = 'L')
 plt.plot(gamma_values, M_desc, label = 'M')
 plt.plot(gamma_values, N_desc, label = 'N')
 plt.plot(gamma_values, O_desc, label = 'O')
+plt.plot(gamma_values, m0_desc, label = 'M0')
 plt.legend()
 plt.show()
