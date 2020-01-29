@@ -166,7 +166,7 @@ def calcule_f(gamma):
 def calcule_g(gamma):
     global g, h
     g = (longitud_eslabones[0]/2)*math.sin(math.radians(gamma))
-    g = h
+    h = g
 
 def calcule_o():
     global o
@@ -217,12 +217,16 @@ def calcule_momento_entrada_actual():
 
 def imprima_valores_actuales(gamma, theta2, L, M, N, O, M0):
     print("Para el valor actual de gamma {} y theta2 {}".format(gamma, theta2))
+    print()
     print("AC-Ax: {}".format(acel_cent[0][0]))
     print("AC-Ay: {}".format(acel_cent[0][1]))
     print("AC-Bx: {}".format(acel_cent[1][0]))
     print("AC-By: {}".format(acel_cent[1][1]))
     print("AC-Cx: {}".format(acel_cent[2][0]))
     print("AC-Cy: {}".format(acel_cent[2][1]))
+    print()
+    print("f: {}".format(f))
+    print("g: {}".format(g))
     #print("o: {}".format(o))
     #print("p: {}".format(p))
     #print("q: {}".format(q))
