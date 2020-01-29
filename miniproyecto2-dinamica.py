@@ -3,6 +3,7 @@ import math
 import numpy as np
 from time import sleep as sl
 
+#Inicialización de variables
 masa_persona = materiales = masa_silla = duracion_movimiento = 0
 g = h = f = e = P = o = q = p = A = B = C = D = E = F = lg3 = rg3 = w3 = w4 = mo = 0.00
 lx = ly = mx = my = nx = ny = ox = oy = alpha2 = alpha3 = alpha4 = w2 = theta3 =  0.00
@@ -12,6 +13,7 @@ peso_eslabones = np.array([0., 0., 0., 0.])
 momento_inercia_eslabones = np.array([0., 0., 0., 0.])
 acel_cent = np.zeros((3,2), float)
 
+delta = 79.875
 ancho = 0.05
 espesor = 0.02
 theta2 = theta4 = 90.00
@@ -62,7 +64,7 @@ def calcule_w2():
 def calcule_masa_eslabones():
     global masa_eslabones
     densidad = 0
-    volumen = 0.01
+    volumen = 0.00908
     if materiales == 1:
         densidad = 7860
     elif materiales == 2:
@@ -78,7 +80,6 @@ def calcule_masa_eslabones():
         if i != 1:
             masa_eslabones[i] = densidad * ancho * espesor * longitud_eslabones[i]
         else:
-            pass
             masa_eslabones[i] = densidad * volumen
 
 def calcule_peso_eslabones():
@@ -95,8 +96,16 @@ def calcule_momento_inercia():
         if i != 1:
             momento_inercia_eslabones[i] = (1/12)* masa_eslabones[i] * math.pow(longitud_eslabones[i], 2)
         else:
-            pass
-            momento_inercia_eslabones[i] = 1.24
+            if materiales == 1:
+                momento_inercia_eslabones[i] = 5.4873
+            elif materiales == 2:
+                momento_inercia_eslabones[i] = 5.4803143
+            elif materiales == 3:
+                momento_inercia_eslabones[i] = 1.2426700
+            elif materiales  == 4:
+                momento_inercia_eslabones[i] = 1.8709863
+            elif materiales == 5:
+                momento_inercia_eslabones[i] = 1.8570237
 
 def calcule_A():
     global A
@@ -142,8 +151,8 @@ def calcule_acel_cent(gamma):
     acel_cent[0][1] = (-math.pow(w2, 2))*(longitud_eslabones[0]/2)*math.sin(math.radians(theta2))
 
     #Eslabón 3
-    acel_cent[1][0] = ((-math.pow(w2, 2))*longitud_eslabones[0]*(math.cos(math.radians(theta2)))) - ((-math.pow(w3, 2))*lg3*(math.cos(math.radians(gamma)))) - (alpha3 * lg3 * math.sin(math.radians(gamma)))
-    acel_cent[1][1] = ((-math.pow(w2, 2))*longitud_eslabones[0]*(math.sin(math.radians(theta2)))) - ((-math.pow(w3, 2))*lg3*(math.sin(math.radians(gamma)))) - (alpha3 * lg3 * math.cos(math.radians(gamma)))
+    acel_cent[1][0] = ((-math.pow(w2, 2))*longitud_eslabones[0]*(math.cos(math.radians(theta2)))) - ((-math.pow(w3, 2))*lg3*(math.cos(math.radians(gamma)))) - (alpha3 * lg3 * math.sin(math.radians(delta)))
+    acel_cent[1][1] = ((-math.pow(w2, 2))*longitud_eslabones[0]*(math.sin(math.radians(theta2)))) - ((-math.pow(w3, 2))*lg3*(math.sin(math.radians(gamma)))) - (alpha3 * lg3 * math.cos(math.radians(delta)))
 
     #Eslabón 4
     acel_cent[2][0] = ((-math.pow(w4, 2))*(longitud_eslabones[2] / 2)*(math.cos(math.radians(theta4)))) - (alpha4*(longitud_eslabones[2] / 2)*(math.sin(math.radians(theta4))))
@@ -161,7 +170,7 @@ def calcule_g(gamma):
 
 def calcule_o():
     global o
-    o = ((peso_eslabones[3] + (masa_eslabones[3]*acel_cent[2][0]))*f) + (masa_eslabones[3]*acel_cent[2][0]*h) - (momento_inercia_eslabones[3]*alpha4)
+    o = ((peso_eslabones[3] + (masa_eslabones[3]*acel_cent[2][0]))*f) + (masa_eslabones[3]*acel_cent[2][1]*h) - (momento_inercia_eslabones[3]*alpha4)
 
 def calcule_p():
     global p
@@ -198,7 +207,7 @@ def calcule_N_actual():
     return math.sqrt(math.pow(nx, 2) + math.pow(ny, 2))  
 
 def calcule_O_actual():
-    global ox
+    global ox, oy
     ox = peso_eslabones[1] + masa_eslabones[1] * acel_cent[0][0] - lx
     oy = masa_eslabones[1]*acel_cent[0][1] - ly
     return math.sqrt(math.pow(ox, 2) + math.pow(oy, 2))
@@ -206,7 +215,7 @@ def calcule_O_actual():
 def calcule_momento_entrada_actual():
     return (lx * e) + (ly * g) - (ox * f) - (oy * h)  
 
-def imprima_valores_actuales(gamma, theta2):
+def imprima_valores_actuales(gamma, theta2, L, M, N, O, M0):
     print("Para el valor actual de gamma {} y theta2 {}".format(gamma, theta2))
     print("A: {}".format(A))
     print("B: {}".format(B))
@@ -216,11 +225,16 @@ def imprima_valores_actuales(gamma, theta2):
     print("F: {}".format(F))
     print()
     print("Alpha3: {}".format(alpha3))
-    print("Alpha3: {}".format(alpha3))
+    print("Alpha4: {}".format(alpha4))
+    print()
+    print("Momento de entrada: {}".format(M0))
+    print("o: {}".format(o))
+    print("p: {}".format(p))
+    print("q: {}".format(q))
 
 #Main
-m0_desc = L_desc = M_desc = N_desc = O_desc = np.zeros(38)
-gamma_values = np.arange(0.00, 38.00, 1.00)
+m0_desc = L_desc = M_desc = N_desc = O_desc = np.zeros(39)
+gamma_values = np.arange(0.00, 39.00, 1.00)
 
 solicitud_datos_entrada()
 calcule_w2()
@@ -230,9 +244,6 @@ calcule_momento_inercia()
 
 #Descenso
 for gamma in gamma_values:
-    theta2 = theta2 + 1
-    theta4 = theta2
-
     calcule_A()
     calcule_B()
     calcule_C()
@@ -254,13 +265,16 @@ for gamma in gamma_values:
     calcule_rg3()
     calcule_q()
 
-    m0_desc[int(gamma) - 1] = calcule_momento_entrada_actual()
-    L_desc[int(gamma) - 1] = calcule_L_actual()
-    M_desc[int(gamma) - 1] = calcule_M_actual()
-    N_desc[int(gamma) - 1] = calcule_N_actual()
-    O_desc[int(gamma) - 1] = calcule_O_actual()
-    imprima_valores_actuales(gamma, theta2)
-    sl(1)
+    m0_desc[int(gamma)] = calcule_momento_entrada_actual()
+    L_desc[int(gamma)] = calcule_L_actual()
+    M_desc[int(gamma)] = calcule_M_actual()
+    N_desc[int(gamma)] = calcule_N_actual()
+    O_desc[int(gamma)] = calcule_O_actual()
+    imprima_valores_actuales(gamma, theta2, L_desc, M_desc, N_desc, O_desc, m0_desc)
+    theta2 = theta2 + 1
+    theta4 = theta2
+
+    #sl(1)
 
 plt.plot(gamma_values, L_desc, label = 'L')
 plt.plot(gamma_values, M_desc, label = 'M')
