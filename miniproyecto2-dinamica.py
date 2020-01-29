@@ -146,15 +146,15 @@ def calcule_alpha4():
 def calcule_acel_cent(gamma):
     global acel_cent
 
-    #Eslabón 2
+    #Eslabón 2-a
     acel_cent[0][0] = (-math.pow(w2, 2))*(longitud_eslabones[0]/2)*math.cos(math.radians(theta2))
     acel_cent[0][1] = (-math.pow(w2, 2))*(longitud_eslabones[0]/2)*math.sin(math.radians(theta2))
 
-    #Eslabón 3
+    #Eslabón 3-b
     acel_cent[1][0] = ((-math.pow(w2, 2))*longitud_eslabones[0]*(math.cos(math.radians(theta2)))) - ((-math.pow(w3, 2))*lg3*(math.cos(math.radians(gamma)))) - (alpha3 * lg3 * math.sin(math.radians(delta)))
     acel_cent[1][1] = ((-math.pow(w2, 2))*longitud_eslabones[0]*(math.sin(math.radians(theta2)))) - ((-math.pow(w3, 2))*lg3*(math.sin(math.radians(gamma)))) - (alpha3 * lg3 * math.cos(math.radians(delta)))
 
-    #Eslabón 4
+    #Eslabón 4-c
     acel_cent[2][0] = ((-math.pow(w4, 2))*(longitud_eslabones[2] / 2)*(math.cos(math.radians(theta4)))) - (alpha4*(longitud_eslabones[2] / 2)*(math.sin(math.radians(theta4))))
     acel_cent[2][1] = ((-math.pow(w4, 2))*(longitud_eslabones[2] / 2)*(math.sin(math.radians(theta4)))) - (alpha4*(longitud_eslabones[2] / 2)*(math.cos(math.radians(theta4))))
 
@@ -170,15 +170,15 @@ def calcule_g(gamma):
 
 def calcule_o():
     global o
-    o = ((peso_eslabones[3] + (masa_eslabones[3]*acel_cent[2][0]))*f) + (masa_eslabones[3]*acel_cent[2][1]*h) - (momento_inercia_eslabones[3]*alpha4)
+    o = ((peso_eslabones[2] + (masa_eslabones[2]*acel_cent[2][0]))*f) + (masa_eslabones[2]*acel_cent[2][1]*h) - (momento_inercia_eslabones[2]*alpha4)
 
 def calcule_p():
     global p
-    p = (masa_eslabones[2]*acel_cent[1][1]*(g + h)) + (P + peso_eslabones[2] + masa_eslabones[2]*acel_cent[1][0])*(e + f)
+    p = (masa_eslabones[1]*acel_cent[1][1]*(g + h)) + (P + peso_eslabones[1] + masa_eslabones[1]*acel_cent[1][0])*(e + f)
 
 def calcule_q():
     global q
-    q = (P*rg3) - (momento_inercia_eslabones[2]*alpha3) + (masa_eslabones[2]*acel_cent[1][1]*n) + ((P+peso_eslabones[2]+(masa_eslabones[2]*acel_cent[1][0]))*j)
+    q = (P*rg3) - (momento_inercia_eslabones[1]*alpha3) + (masa_eslabones[1]*acel_cent[1][1]*n) + ((P+peso_eslabones[1]+(masa_eslabones[1]*acel_cent[1][0]))*j)
 
 def calcule_PFuerza():
     global P
@@ -196,20 +196,20 @@ def calcule_L_actual():
 
 def calcule_M_actual():
     global mx, my
-    mx = - P - lx - peso_eslabones[2] - masa_eslabones[2] * acel_cent[1][0]
-    my = - ly - masa_eslabones[2] * acel_cent[1][1]
+    mx = - P - lx - peso_eslabones[1] - masa_eslabones[1] * acel_cent[1][0]
+    my = - ly - masa_eslabones[1] * acel_cent[1][1]
     return math.sqrt(math.pow(mx, 2) + math.pow(my, 2)) 
 
 def calcule_N_actual():
     global nx, ny
-    nx = mx - peso_eslabones[3] - masa_eslabones[3] * acel_cent[2][0]
-    ny = my - masa_eslabones[3] * acel_cent[2][1]
+    nx = mx - peso_eslabones[2] - masa_eslabones[2] * acel_cent[2][0]
+    ny = my - masa_eslabones[2] * acel_cent[2][1]
     return math.sqrt(math.pow(nx, 2) + math.pow(ny, 2))  
 
 def calcule_O_actual():
     global ox, oy
-    ox = peso_eslabones[1] + masa_eslabones[1] * acel_cent[0][0] - lx
-    oy = masa_eslabones[1]*acel_cent[0][1] - ly
+    ox = peso_eslabones[0] + masa_eslabones[0] * acel_cent[0][0] - lx
+    oy = masa_eslabones[0]*acel_cent[0][1] - ly
     return math.sqrt(math.pow(ox, 2) + math.pow(oy, 2))
 
 def calcule_momento_entrada_actual():
@@ -217,20 +217,15 @@ def calcule_momento_entrada_actual():
 
 def imprima_valores_actuales(gamma, theta2, L, M, N, O, M0):
     print("Para el valor actual de gamma {} y theta2 {}".format(gamma, theta2))
-    print("A: {}".format(A))
-    print("B: {}".format(B))
-    print("C: {}".format(C))
-    print("D: {}".format(D))
-    print("E: {}".format(E))
-    print("F: {}".format(F))
-    print()
-    print("Alpha3: {}".format(alpha3))
-    print("Alpha4: {}".format(alpha4))
-    print()
-    print("Momento de entrada: {}".format(M0))
-    print("o: {}".format(o))
-    print("p: {}".format(p))
-    print("q: {}".format(q))
+    print("AC-Ax: {}".format(acel_cent[0][0]))
+    print("AC-Ay: {}".format(acel_cent[0][1]))
+    print("AC-Bx: {}".format(acel_cent[1][0]))
+    print("AC-By: {}".format(acel_cent[1][1]))
+    print("AC-Cx: {}".format(acel_cent[2][0]))
+    print("AC-Cy: {}".format(acel_cent[2][1]))
+    #print("o: {}".format(o))
+    #print("p: {}".format(p))
+    #print("q: {}".format(q))
 
 #Main
 m0_desc = L_desc = M_desc = N_desc = O_desc = np.zeros(39)
