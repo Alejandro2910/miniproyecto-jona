@@ -18,6 +18,15 @@ M_desc = np.zeros(39)
 N_desc = np.zeros(39)
 O_desc = np.zeros(39)
 
+m0_asc = np.zeros(39)
+L_asc = np.zeros(39)
+M_asc = np.zeros(39)
+N_asc = np.zeros(39)
+O_asc = np.zeros(39)
+
+gamma_values_desc = np.arange(-38.00, 1.00, 1.00)
+gamma_values_asc = np.arange(0.00, 39.00, 1.00)
+
 #Constantes
 delta = 79.875
 ancho = 0.05
@@ -28,41 +37,6 @@ j = 0.56
 i = 1.3
 k = 0.1
 n = 1.18
-
-"""
-def solicitud_datos_entrada():
-    global masa_persona, materiales, masa_silla, duracion_movimiento
-    entrada = 121.0
-    while entrada > 120.0:
-        entrada = float(input("Favor ingresar la masa de la persona, debe ser menor a 120kg\nR: "))
-        if entrada <= 120.0:
-            masa_persona = entrada
-        else:
-            print("\nEl valor está fuera de los límites, favor ingresarlo de nuevo.")
-
-    entrada = 0
-
-    #Revisar materiales
-    materiales = input("\nSeleccione el numero con los materiales que tendrá el mecanismo\n1. Acero inoxidable\n2. Acero A36\n3. Fibra de carbono(HEXCEL AS4C)\n4. Aleación de aluminio(5052-H38 BARRA (SS))\n5. Aleación de aliminio(5086-H32 BARRA (SS))\nR: ")
-    
-    entrada = input("\nSeleccione la masa de la silla\n1. 17kg\n2. 24kg\nR: ")
-
-    if entrada == 1:
-        masa_silla = 17
-    elif entrada == 2:
-        masa_silla = 24
-    
-    entrada = 0
-    
-    entrada = input("\nSeleccione la duracion del movimiento\n1. 70s(1 minuto y 10 segundos)\n2. 90s(1 minutos y 30 segundos)\n3. 120s(2 minutos)\nR: ")
-    
-    if entrada == 1:
-        duracion_movimiento = 70
-    elif entrada == 2:
-        duracion_movimiento = 90
-    else:
-        duracion_movimiento = 190
-"""
 
 def asigne_valores(mp, ms, mas, dm):
     global duracion_movimiento, masa_silla, masa_persona, materiales
@@ -81,15 +55,15 @@ def calcule_masa_eslabones():
     densidad = 0
     volumen = 0.00908
     if materiales == 1:
-        densidad = 7860
+        densidad = 7860.0
     elif materiales == 2:
-        densidad = 7850
+        densidad = 7850.0
     elif materiales == 3:
-        densidad = 1780
+        densidad = 1780.0
     elif materiales  == 4:
-        densidad = 2680
+        densidad = 2680.0
     elif materiales == 5:
-        densidad = 2660
+        densidad = 2660.0
 
     for i in range(4):
         if i != 1:
@@ -197,7 +171,7 @@ def calcule_q():
 
 def calcule_PFuerza():
     global P
-    P = ((masa_persona + masa_silla)/2)*9.81
+    P = ((masa_persona + masa_silla)/2.0)*9.81
 
 def calcule_rg3():
     global rg3
@@ -230,8 +204,44 @@ def calcule_O_actual():
 def calcule_momento_entrada_actual():
     return (lx * e) + (ly * g) - (ox * f) - (oy * h) 
 
-"""
-def imprima_valores_actuales(gamma, theta2, L, M, N, O, M0):
+def imprima_valores_actuales(file, gamma, theta2, L, M, N, O, M0):
+    file.write("Para el valor actual de gamma {} y theta2 {}\n".format(gamma, theta2))
+    file.write("\n")
+    file.write("AC-Ax: {}\n".format(acel_cent[0][0]))
+    file.write("AC-Ay: {}\n".format(acel_cent[0][1]))
+    file.write("AC-Bx: {}\n".format(acel_cent[1][0]))
+    file.write("AC-By: {}\n".format(acel_cent[1][1]))
+    file.write("AC-Cx: {}\n".format(acel_cent[2][0]))
+    file.write("AC-Cy: {}\n".format(acel_cent[2][1]))
+    file.write("\n")
+    #file.write("masa persona: {}\n".format(masa_persona))
+    #file.write("masa silla: {}\n".format(masa_silla))
+    #file.write("\n")
+    #file.write("alpha4: {}\n".format(alpha4))
+    #file.write("\n")
+    #file.write("f: {}\n".format(f))
+    #file.write("g: {}\n".format(g))
+    #file.write("\n")
+    #file.write("e: {}\n".format(e))
+    #file.write("h: {}\n".format(h))
+    #file.write("\n")
+    #file.write("Momento inercia eslabon c: {}\n".format(momento_inercia_eslabones[2]))
+    #file.write("\n")
+    #file.write("masa eslabón c: {}\n".format(masa_eslabones[2]))
+    #file.write("\n")
+    #file.write("Peso eslabón c: {}\n".format(peso_eslabones[2]))
+    #file.write("\n")
+    #file.write("o: {}\n".format(o))
+    #file.write("p: {}\n".format(p))
+    #file.write("q: {}\n".format(q))
+    #file.write("\n")
+    file.write("M0: {}\n".format(M0))
+    file.write("L: {}\n".format(L))
+    file.write("M: {}\n".format(M))
+    file.write("N: {}\n".format(N))
+    file.write("O: {}\n".format(O))
+    file.write("\n============================================================================================\n")
+    """
     print("Para el valor actual de gamma {} y theta2 {}".format(gamma, theta2))
     print()
     print("AC-Ax: {}".format(acel_cent[0][0]))
@@ -253,17 +263,19 @@ def imprima_valores_actuales(gamma, theta2, L, M, N, O, M0):
     print("M: {}".format(M))
     print("N: {}".format(N))
     print("O: {}".format(O))
-"""
-def main():
-    global m0_desc, L_desc, M_desc, N_desc, O_desc, theta2, theta4
-    gamma_values_desc = np.arange(-38.00, 1.00, 1.00)
+    """
 
-    #solicitud_datos_entrada()
+
+def main():
+    global m0_desc, L_desc, M_desc, N_desc, O_desc, theta2, theta4, gamma_values_desc, gamma_values_asc 
+    
     calcule_w2()
     calcule_masa_eslabones()
     calcule_peso_eslabones()
     calcule_momento_inercia()
-
+    
+    file = open("values.txt", "w+")
+    file.write("\n DESCENSO \n")
     #Descenso
     for gamma in range(0, 39):
         calcule_A()
@@ -287,31 +299,53 @@ def main():
         calcule_rg3()
         calcule_q()
 
-        
         L_desc[int(gamma)] = calcule_L_actual()
         M_desc[int(gamma)] = calcule_M_actual()
         N_desc[int(gamma)] = calcule_N_actual()
         O_desc[int(gamma)] = calcule_O_actual()
         m0_desc[int(gamma)] = calcule_momento_entrada_actual()
+        imprima_valores_actuales(file, gamma, theta2, L_desc, M_desc, N_desc, O_desc, m0_desc)
         theta2 = theta2 + 1.0
         theta4 = theta2
 
-    plt.plot(gamma_values_desc, L_desc, label = 'L desc')
-    plt.plot(gamma_values_desc, M_desc, label = 'M desc')
-    plt.plot(gamma_values_desc, N_desc, label = 'N desc')
-    plt.plot(gamma_values_desc, O_desc, label = 'O desc')
+    theta2 = 128.0
+    file.write("\n ASCENSO \n")
+    #Ascenso
+    for gamma in range(38, -1, -1):
+        calcule_A()
+        calcule_B()
+        calcule_C()
+        calcule_D()
+        calcule_E()
+        calcule_F()
 
-    plt.xlabel("Rango de movimiento(Grados)")
-    plt.ylabel("Reacciones en los apoyos(N)")
-    plt.legend()
-    plt.show()
+        calcule_alpha4()
+        calcule_alpha3()
 
-    plt.plot(gamma_values_desc, m0_desc, label = 'M0 desc')
+        calcule_LG3()
+        calcule_acel_cent(gamma)
 
-    plt.xlabel("Rango de movimiento(Grados)")
-    plt.ylabel("Momento de entrada")
-    plt.legend()
-    plt.show()
+        calcule_f(gamma)
+        calcule_g(gamma)
+        calcule_o()
+        calcule_PFuerza()
+        calcule_p()
+        calcule_rg3()
+        calcule_q()
+
+        L_asc[38 - int(gamma)] = calcule_L_actual()
+        M_asc[38 - int(gamma)] = calcule_M_actual()
+        N_asc[38 - int(gamma)] = calcule_N_actual()
+        O_asc[38 - int(gamma)] = calcule_O_actual()
+        m0_asc[38 - int(gamma)] = calcule_momento_entrada_actual()
+        imprima_valores_actuales(file, gamma, theta2, L_asc, M_asc, N_asc, O_asc, m0_asc)
+        theta2 = theta2 - 1.0
+        theta4 = theta2
+
+    file.close()
+
+    graph_LMNO()
+    graph_momento_entrada()
     """
     ans = 0
     while(ans != -1):
@@ -322,3 +356,27 @@ def main():
             print("N: {}".format(N_desc[ans]))
             print("O: {}".format(O_desc[ans]))
     """
+def graph_LMNO():
+    plt.plot(gamma_values_desc, L_desc, label = 'L desc')
+    plt.plot(gamma_values_desc, M_desc, label = 'M desc')
+    plt.plot(gamma_values_desc, N_desc, label = 'N desc')
+    plt.plot(gamma_values_desc, O_desc, label = 'O desc')
+
+    plt.plot(gamma_values_asc, L_asc, label = 'L asc')
+    plt.plot(gamma_values_asc, M_asc, label = 'M asc')
+    plt.plot(gamma_values_asc, N_asc, label = 'N asc')
+    plt.plot(gamma_values_asc, O_asc, label = 'O asc')
+
+    plt.xlabel("Rango de movimiento(Grados)")
+    plt.ylabel("Reacciones en los apoyos(N)")
+    plt.legend()
+    plt.show()
+
+def graph_momento_entrada():
+    plt.plot(gamma_values_asc, m0_asc, label = 'M0 asc')
+    plt.plot(gamma_values_desc, m0_desc, label = 'M0 desc')
+
+    plt.xlabel("Rango de movimiento(Grados)")
+    plt.ylabel("Momento de entrada")
+    plt.legend()
+    plt.show()

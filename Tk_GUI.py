@@ -9,8 +9,8 @@ materiales = {"Acero Inoxidable" : "1",
               "Aleación de aluminio(5052-H38 BARRA (SS))" : "4", 
               "Aleación de aliminio(5086-H32 BARRA (SS))" : "5"}
 
-masa_silla = {"17kg" : 1, 
-              "24kg" : 2}
+masa_silla = {"17kg" : 17, 
+              "24kg" : 24}
 
 duracion_movimiento = {"70s" : 70,
                        "90s" : 90,
@@ -19,7 +19,7 @@ duracion_movimiento = {"70s" : 70,
 window = Tk()
 
 material_seleccionado = StringVar(window, value="1")
-masa_seleccionada = IntVar(window, value=1)
+masa_seleccionada = IntVar(window, value=17)
 duracion_movimiento_seleccionada = IntVar(window, value=70)
 masa_persona = IntVar(window, value=80)
 label1 = Label(window, text = 'Indique la masa de la persona, menor o igual a 120kg', font=('arial', 12))
@@ -36,10 +36,10 @@ def check_weight():
             mas = float(masa_seleccionada.get())
             dm = float(duracion_movimiento_seleccionada.get())
             #print('Masa de la persona: {}\nMaterial seleccionado: {}\nMasa de la silla: {}\nDuracion del movimiento: {}'.format(mp, ms, mas, dm))
-            #window.destroy()
             widget_list = all_children(window)
             for item in widget_list:
                 item.pack_forget()
+            window.destroy()
             run_simulation(mp, ms, mas, dm)
         else:
             label1.config(foreground="red")
