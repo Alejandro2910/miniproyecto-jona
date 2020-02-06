@@ -1,7 +1,7 @@
+# -*- coding: utf-8 -*-
 from matplotlib import pyplot as plt
 import math
 import numpy as np
-from time import sleep as sl
 
 #Inicialización de variables
 masa_persona = materiales = masa_silla = duracion_movimiento = 0
@@ -12,7 +12,13 @@ masa_eslabones = np.array([0., 0., 0., 0.])
 peso_eslabones = np.array([0., 0., 0., 0.])
 momento_inercia_eslabones = np.array([0., 0., 0., 0.])
 acel_cent = np.zeros((3,2), float)
+m0_desc = np.zeros(39)
+L_desc = np.zeros(39)
+M_desc = np.zeros(39)
+N_desc = np.zeros(39)
+O_desc = np.zeros(39)
 
+#Constantes
 delta = 79.875
 ancho = 0.05
 espesor = 0.02
@@ -23,6 +29,7 @@ i = 1.3
 k = 0.1
 n = 1.18
 
+"""
 def solicitud_datos_entrada():
     global masa_persona, materiales, masa_silla, duracion_movimiento
     entrada = 121.0
@@ -55,6 +62,14 @@ def solicitud_datos_entrada():
         duracion_movimiento = 90
     else:
         duracion_movimiento = 190
+"""
+
+def asigne_valores(mp, ms, mas, dm):
+    global duracion_movimiento, masa_silla, masa_persona, materiales
+    masa_persona = mp
+    materiales = ms
+    masa_silla = mas
+    duracion_movimiento = dm
 
 def calcule_w2():
     global w2, w4
@@ -141,7 +156,7 @@ def calcule_alpha3():
 
 def calcule_alpha4():
     global alpha4
-    aplha4 = ((C*E) - (B*F))/((A*E) - (B*D))
+    alpha4 = ((C*E) - (B*F))/((A*E) - (B*D))
 
 def calcule_acel_cent(gamma):
     global acel_cent
@@ -190,8 +205,8 @@ def calcule_rg3():
 
 def calcule_L_actual():
     global lx, ly
-    lx = (1 / (e + f))*(- o - p - ly * (g + h))
     ly = (-q)/(k + n)
+    lx = (1 / (e + f))*(- o - p - ly * (g + h))
     return math.sqrt(math.pow(lx, 2) + math.pow(ly, 2))
 
 def calcule_M_actual():
@@ -213,19 +228,19 @@ def calcule_O_actual():
     return math.sqrt(math.pow(ox, 2) + math.pow(oy, 2))
 
 def calcule_momento_entrada_actual():
-    return (lx * e) + (ly * g) - (ox * f) - (oy * h)  
+    return (lx * e) + (ly * g) - (ox * f) - (oy * h) 
 
+"""
 def imprima_valores_actuales(gamma, theta2, L, M, N, O, M0):
     print("Para el valor actual de gamma {} y theta2 {}".format(gamma, theta2))
     print()
-    """print("AC-Ax: {}".format(acel_cent[0][0]))
+    print("AC-Ax: {}".format(acel_cent[0][0]))
     print("AC-Ay: {}".format(acel_cent[0][1]))
     print("AC-Bx: {}".format(acel_cent[1][0]))
     print("AC-By: {}".format(acel_cent[1][1]))
     print("AC-Cx: {}".format(acel_cent[2][0]))
     print("AC-Cy: {}".format(acel_cent[2][1]))
     print()
-    """
     print("f: {}".format(f))
     print("g: {}".format(g))
     print()
@@ -238,59 +253,72 @@ def imprima_valores_actuales(gamma, theta2, L, M, N, O, M0):
     print("M: {}".format(M))
     print("N: {}".format(N))
     print("O: {}".format(O))
+"""
+def main():
+    global m0_desc, L_desc, M_desc, N_desc, O_desc, theta2, theta4
+    gamma_values_desc = np.arange(-38.00, 1.00, 1.00)
 
-#Main
-m0_desc = np.zeros(39)
-L_desc = np.zeros(39)
-M_desc = np.zeros(39)
-N_desc = np.zeros(39)
-O_desc = np.zeros(39)
-gamma_values = np.arange(0.00, 39.00, 1.00)
+    #solicitud_datos_entrada()
+    calcule_w2()
+    calcule_masa_eslabones()
+    calcule_peso_eslabones()
+    calcule_momento_inercia()
 
-solicitud_datos_entrada()
-calcule_w2()
-calcule_masa_eslabones()
-calcule_peso_eslabones()
-calcule_momento_inercia()
+    #Descenso
+    for gamma in range(0, 39):
+        calcule_A()
+        calcule_B()
+        calcule_C()
+        calcule_D()
+        calcule_E()
+        calcule_F()
 
-#Descenso
-for gamma in gamma_values:
-    calcule_A()
-    calcule_B()
-    calcule_C()
-    calcule_D()
-    calcule_E()
-    calcule_F()
+        calcule_alpha4()
+        calcule_alpha3()
 
-    calcule_alpha4()
-    calcule_alpha3()
+        calcule_LG3()
+        calcule_acel_cent(gamma)
 
-    calcule_LG3()
-    calcule_acel_cent(gamma)
+        calcule_f(gamma)
+        calcule_g(gamma)
+        calcule_o()
+        calcule_PFuerza()
+        calcule_p()
+        calcule_rg3()
+        calcule_q()
 
-    calcule_f(gamma)
-    calcule_g(gamma)
-    calcule_o()
-    calcule_PFuerza()
-    calcule_p()
-    calcule_rg3()
-    calcule_q()
+        
+        L_desc[int(gamma)] = calcule_L_actual()
+        M_desc[int(gamma)] = calcule_M_actual()
+        N_desc[int(gamma)] = calcule_N_actual()
+        O_desc[int(gamma)] = calcule_O_actual()
+        m0_desc[int(gamma)] = calcule_momento_entrada_actual()
+        theta2 = theta2 + 1.0
+        theta4 = theta2
 
-    m0_desc[int(gamma)] = calcule_momento_entrada_actual()
-    L_desc[int(gamma)] = calcule_L_actual()
-    M_desc[int(gamma)] = calcule_M_actual()
-    N_desc[int(gamma)] = calcule_N_actual()
-    O_desc[int(gamma)] = calcule_O_actual()
-    #imprima_valores_actuales(gamma, theta2, L_desc, M_desc, N_desc, O_desc, m0_desc)
-    theta2 = theta2 + 1
-    theta4 = theta2
+    plt.plot(gamma_values_desc, L_desc, label = 'L desc')
+    plt.plot(gamma_values_desc, M_desc, label = 'M desc')
+    plt.plot(gamma_values_desc, N_desc, label = 'N desc')
+    plt.plot(gamma_values_desc, O_desc, label = 'O desc')
 
-    #sl(1)
+    plt.xlabel("Rango de movimiento(Grados)")
+    plt.ylabel("Reacciones en los apoyos(N)")
+    plt.legend()
+    plt.show()
 
-plt.plot(gamma_values, L_desc, label = 'L')
-plt.plot(gamma_values, M_desc, label = 'M')
-plt.plot(gamma_values, N_desc, label = 'N')
-plt.plot(gamma_values, O_desc, label = 'O')
-plt.plot(gamma_values, m0_desc, label = 'M0')
-plt.legend()
-plt.show()
+    plt.plot(gamma_values_desc, m0_desc, label = 'M0 desc')
+
+    plt.xlabel("Rango de movimiento(Grados)")
+    plt.ylabel("Momento de entrada")
+    plt.legend()
+    plt.show()
+    """
+    ans = 0
+    while(ans != -1):
+        ans = int(input("Si desea saber el valor específico de las reacciones, ingrese el valor del rango de movimiento entre 0 y 38 grados.De lo contrario inserte -1\nR: "))
+        if(ans != -1):
+            print("L: {}".format(L_desc[ans]))
+            print("M: {}".format(M_desc[ans]))
+            print("N: {}".format(N_desc[ans]))
+            print("O: {}".format(O_desc[ans]))
+    """
