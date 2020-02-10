@@ -1,1 +1,0 @@
-# miniproyecto-jona
